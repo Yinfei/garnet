@@ -1,3 +1,3 @@
-# garnet
+# Garnet
 
-Minimalist static website with Ruby and Rack
+Minimalist dynamic website with pure Ruby
