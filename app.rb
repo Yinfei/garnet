@@ -34,7 +34,7 @@ module Garnet
     def favicon
       favicon_file = File.read(ROOT + '/favicon.ico')
 
-      ['200', {'Content-Type' => 'image/vnd.microsoft.icon',
+      ['200', {'Content-Type' => 'image/x-icon',
                'Content-Length' => favicon_file.bytesize.to_s }, [favicon_file]]
     end
 
