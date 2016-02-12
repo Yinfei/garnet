@@ -1,3 +1,18 @@
 body{
-    font-family: 'Monaco';
+    font-family: 'Arial';
+    background-color: whitesmoke;
+}
+
+#content{
+    background: #fff;
+    height: 95%;
+    width: 800px;
+    margin: 10px auto;
+    padding: 10px 40px;
+
+    -moz-box-shadow: 0px 2px 2px 0px #656565;
+    -webkit-box-shadow: 0px 2px 2px 0px #656565;
+    -o-box-shadow: 0px 2px 2px 0px #656565;
+    box-shadow: 0px 2px 2px 0px #656565;
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#656565, Direction=180, Strength=2);
 }
