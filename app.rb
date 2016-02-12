@@ -28,7 +28,15 @@ module Garnet
 
       return not_found unless File.exist?(file)
 
-      ['200', {'Content-Type' => 'text/html'}, [erb(file)]]
+      ['200', {'Content-Type' => 'text/html' }, [erb(file)]]
+    end
+
+    def asset_file(name)
+      file = [ROOT, name].join
+
+      return not_found unless File.exist?(file)
+
+      ['200', {'Content-Type' => 'text/html' }, [File.read(file)]]
     end
 
     def favicon
@@ -51,6 +59,7 @@ module Garnet
 
       return homepage if endpoint == '/'
       return favicon  if endpoint == '/favicon.ico'
+      return asset_file(endpoint) if endpoint =~ /\/assets/
 
       render_view(endpoint)
     end
