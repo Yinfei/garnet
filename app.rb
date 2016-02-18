@@ -6,18 +6,24 @@ module Garnet
   class Application
 
     ROOT ||= File.expand_path(Dir.pwd)
-    LAYOUT ||= ROOT + '/views/layout.erb'
+
+    SYSTEM_FILES ||= { 'layout'    => ROOT + '/views/layout.erb',
+                       'favicon'   => ROOT + '/favicon.ico',
+                       'homepage'  => ROOT + '/views/index.erb',
+                       'not_found' => ROOT + '/views/404.erb' }
+
+    HEADERS ||= { 'html' => {'Content-Type' => 'text/html' },
+                  'favicon' => { 'Content-Type' => 'image/x-icon',
+                                 'Content-Length' => File.read(SYSTEM_FILES['favicon']).bytesize.to_s } }
 
     def erb(file)
       params = build_partial(file)
-      layout = File.read(LAYOUT)
+      layout = File.read(SYSTEM_FILES['layout'])
 
       ERB.new(layout).result(params.instance_eval { binding })
     end
 
     def build_partial(file)
-      return OpenStruct.new(content: nil) if file.nil?
-
       content = ERB.new(File.read(File.expand_path(file))).result(binding)
 
       OpenStruct.new(content: content)
@@ -28,7 +34,7 @@ module Garnet
 
       return not_found unless File.exist?(file)
 
-      ['200', {'Content-Type' => 'text/html' }, [erb(file)]]
+      ['200', HEADERS['html'], [erb(file)]]
     end
 
     def asset_file(name)
@@ -36,32 +42,29 @@ module Garnet
 
       return not_found unless File.exist?(file)
 
-      ['200', {'Content-Type' => 'text/html' }, [File.read(file)]]
+      ['200', HEADERS['html'], [File.read(file)]]
     end
 
     def favicon
-      favicon_file = File.read(ROOT + '/favicon.ico')
-
-      ['200', {'Content-Type' => 'image/x-icon',
-               'Content-Length' => favicon_file.bytesize.to_s }, [favicon_file]]
+      ['200', HEADERS['favicon'], [File.read(SYSTEM_FILES['favicon'])]]
     end
 
     def homepage
-      ['200', {'Content-Type' => 'text/html'}, [erb(nil)]]
+      ['200', HEADERS['html'], [erb(SYSTEM_FILES['homepage'])]]
     end
 
     def not_found
-      ['404', {'Content-Type' => 'text/html'}, [erb(ROOT + '/views/404.erb')]]
+      ['404', HEADERS['html'], [erb(SYSTEM_FILES['not_found'])]]
     end
 
     def call(env)
-      endpoint = Rack::Request.new(env).path
+      endpoint_called = Rack::Request.new(env).path
 
-      return homepage if endpoint == '/'
-      return favicon  if endpoint == '/favicon.ico'
-      return asset_file(endpoint) if endpoint =~ /\/assets/
+      return favicon if endpoint_called == '/favicon.ico'
+      return homepage if endpoint_called == '/'
+      return asset_file(endpoint_called) if endpoint_called =~ /\/assets/
 
-      render_view(endpoint)
+      render_view(endpoint_called)
     end
   end
 end
